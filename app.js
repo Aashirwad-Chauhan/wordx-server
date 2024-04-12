@@ -1,30 +1,30 @@
-import express from "express";
-import { connectDB } from "./utils/features.js";
-import dotenv from "dotenv";
-import { errorMiddleware } from "./middlewares/error.js";
+import { v2 as cloudinary } from "cloudinary";
 import cookieParser from "cookie-parser";
-import {Server} from "socket.io";
-import {createServer} from "http";
-import { 
-    CHAT_JOINED, 
-    CHAT_LEAVED, 
-    NEW_MESSAGE, 
-    NEW_MESSAGE_ALERT, 
-    ONLINE_USERS, 
-    START_TYPING, 
-    STOP_TYPING 
-} from "./constants/events.js";
-import {v4 as uuid} from "uuid";
 import cors from "cors";
-import {v2 as cloudinary} from "cloudinary";
-import { getSockets } from "./lib/helper.js";
-import { Message } from "./models/messages.js";
+import dotenv from "dotenv";
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import { v4 as uuid } from "uuid";
 import { corsOptions } from "./constants/config.js";
+import {
+  CHAT_JOINED,
+  CHAT_LEAVED,
+  NEW_MESSAGE,
+  NEW_MESSAGE_ALERT,
+  ONLINE_USERS,
+  START_TYPING,
+  STOP_TYPING
+} from "./constants/events.js";
+import { getSockets } from "./lib/helper.js";
 import { socketAuthenticator } from "./middlewares/auth.js";
+import { errorMiddleware } from "./middlewares/error.js";
+import { Message } from "./models/messages.js";
+import { connectDB } from "./utils/features.js";
 
-import userRoute from "./routes/user.js";
-import chatRoute from "./routes/chat.js";
 import adminRoute from "./routes/admin.js";
+import chatRoute from "./routes/chat.js";
+import userRoute from "./routes/user.js";
 
 
 //Define path for .env
@@ -48,8 +48,12 @@ cloudinary.config({
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-  
+
 const app = express();
+// const cors = require('cors');
+app.use(cors(corsOptions));
+  
+
 const server = createServer(app);
 const io = new Server(server, {
     cors: corsOptions,
@@ -58,8 +62,9 @@ const io = new Server(server, {
 app.set("io", io);
 app.use(express.json());
 app.use(cookieParser()); 
-// app.use(cors(corsOptions));
-app.use(cors());
+
+
+
 
 
 //ROUTES
@@ -164,4 +169,4 @@ server.listen(port, ()=>{
     console.log(`At Localhost:${port} in ${envMode}`);
 });
 
-export {adminSecretKey, envMode, userSocketIDs};
+export { adminSecretKey, envMode, userSocketIDs };
